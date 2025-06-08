@@ -73,6 +73,17 @@ public:
         return os;
     }
 
+
+        /**
+     * @brief Returns the number of elements currently stored in the container.
+     * 
+     * @return std::size_t The number of elements in the container.
+     */
+
+     size_t size() const {
+        return data.size();
+    }
+
     /*
      Provides access to the internal vector (read-only).
      @return A const reference to the internal vector storing container elements.

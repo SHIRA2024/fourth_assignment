@@ -125,3 +125,86 @@ TEST_CASE("Edge case: empty container") {
     }
     CHECK(result.empty());
 }
+
+// Additional tests for MyContainer with different data types and edge cases
+
+// Test MyContainer with std::string
+TEST_CASE("MyContainer<std::string> - add, remove, and AscendingOrderIterator") {
+    MyContainer<std::string> c;
+    c.add("banana");
+    c.add("apple");
+    c.add("cherry");
+
+    // Test ascending order for strings
+    std::vector<std::string> result;
+    for (auto it = AscendingOrderIterator<std::string>::begin(c); it != AscendingOrderIterator<std::string>::end(c); ++it) {
+        result.push_back(*it);
+    }
+    CHECK(result == std::vector<std::string>({"apple", "banana", "cherry"}));
+
+    // Test removal
+    c.remove("banana");
+    CHECK(c.getData().size() == 2);
+    CHECK_THROWS_AS(c.remove("mango"), std::runtime_error);
+}
+
+// Test MyContainer with double values
+TEST_CASE("MyContainer<double> - DescendingOrderIterator") {
+    MyContainer<double> c;
+    c.add(3.14);
+    c.add(2.71);
+    c.add(1.618);
+
+    std::vector<double> result;
+    for (auto it = DescendingOrderIterator<double>::begin(c); it != DescendingOrderIterator<double>::end(c); ++it) {
+        result.push_back(*it);
+    }
+    CHECK(result == std::vector<double>({3.14, 2.71, 1.618}));
+}
+
+// Custom struct for testing
+struct Point {
+    int x;
+    bool operator<(const Point& other) const { return x < other.x; }
+    bool operator>(const Point& other) const { return x > other.x; }
+    bool operator==(const Point& other) const { return x == other.x; }
+};
+
+// Required for printing Points in test output
+std::ostream& operator<<(std::ostream& os, const Point& p) {
+    return os << "{" << p.x << "}";
+}
+
+TEST_CASE("MyContainer::size basic behavior") {
+    MyContainer<int> c;
+    CHECK(c.size() == 0);
+    c.add(1);
+    CHECK(c.size() == 1);
+    c.add(2);
+    CHECK(c.size() == 2);
+    c.remove(1);
+    CHECK(c.size() == 1);
+    c.remove(2);
+    CHECK(c.size() == 0);
+}
+
+
+
+TEST_CASE("MyContainer::remove throws on non-existent element") {
+    MyContainer<int> c;
+    CHECK_THROWS_AS(c.remove(5), std::runtime_error);
+    c.add(1);
+    CHECK_THROWS_AS(c.remove(2), std::runtime_error);
+}
+
+TEST_CASE("MyContainer edge case: very large number of elements") {
+    MyContainer<int> c;
+    for (int i = 0; i < 1000; ++i) {
+        c.add(i);
+    }
+    CHECK(c.size() == 1000);
+    for (int i = 0; i < 500; ++i) {
+        c.remove(i);
+    }
+    CHECK(c.size() == 500);
+}
